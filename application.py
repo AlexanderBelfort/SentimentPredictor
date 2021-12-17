@@ -45,51 +45,54 @@ vectorizer = pickle.load(open("vectorizer.pkl", 'rb'))
 def home():
     return render_template('index.html')
 
+
+
+
+
+
 @app.route('/predict', methods=['POST'])
 def predict():
 
-        
-    def normalize_corpus(corpus, html_stripping=True, contraction_expansion=True,
+    def lemmatize_text(text):
+        text = nlp(text)
+        return ' '.join([word.lemma_ if word.lemma_ != '-PRON-' else word.text for word in text])  
+
+    def normalize_corpus(doc, html_stripping=True, contraction_expansion=True,
                         accented_char_removal=True, text_lower_case=True, 
                         text_lemmatization=True, special_char_removal=True, 
                         stopword_removal=True):
 
 
-
-        normalized_corpus = []
-        # normalize each document in the corpus
-        for doc in corpus:
-            # strip HTML
-            if html_stripping:
-                doc = strip_html_tags(doc)
-            # remove accented characters
-            if accented_char_removal:
-                doc = remove_accented_chars(doc)
-            # expand contractions    
-            if contraction_expansion:
-                doc = expand_contractions(doc)
-            # lowercase the text    
-            if text_lower_case:
-                doc = doc.lower()
-            # remove extra newlines
-            doc = re.sub(r'[\r|\n|\r\n]+', ' ',doc)
-            # insert spaces between special characters to isolate them    
-            special_char_pattern = re.compile(r'([{.(-)!}])')
-            doc = special_char_pattern.sub(" \\1 ", doc)
-            # lemmatize text
-            if text_lemmatization:
-                doc = lemmatize_text(doc)
-            # remove special characters    
-            if special_char_removal:
-                doc = remove_special_characters(doc)  
-            # remove extra whitespace
-            doc = re.sub(' +', ' ', doc)
-            # remove stopwords
-            if stopword_removal:
+        # strip HTML
+        if html_stripping:
+            doc = strip_html_tags(doc)
+        # remove accented characters
+        if accented_char_removal:
+            doc = remove_accented_chars(doc)
+        # expand contractions    
+        if contraction_expansion:
+            doc = expand_contractions(doc)
+        # lowercase the text    
+        if text_lower_case:
+            doc = doc.lower()
+        # remove extra newlines
+        doc = re.sub(r'[\r|\n|\r\n]+', ' ',doc)
+        # insert spaces between special characters to isolate them    
+        special_char_pattern = re.compile(r'([{.(-)!}])')
+        doc = special_char_pattern.sub(" \\1 ", doc)
+        # lemmatize text
+        if text_lemmatization:
+            doc = lemmatize_text(doc)
+        # remove special characters    
+        if special_char_removal:
+            doc = remove_special_characters(doc)  
+        # remove extra whitespace
+        doc = re.sub(' +', ' ', doc)
+        # remove stopwords
+        if stopword_removal:
                 doc = remove_stopwords(doc, is_lower_case=text_lower_case)
                 
-            normalized_corpus.append(doc)
-        return normalized_corpus
+        return doc
 
 
     def remove_stopwords(text, is_lower_case=False):
