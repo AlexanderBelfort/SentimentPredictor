@@ -9,6 +9,7 @@ import re
 import unicodedata
 from bs4 import BeautifulSoup
 import spacy
+
 nlp = spacy.load("en_core_web_sm")
 
 app = Flask(__name__)
